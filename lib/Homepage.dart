@@ -1,9 +1,12 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:assignment_3/pages/ContactPage.dart';
+import 'package:assignment_3/pages/HomeView.dart';
 import 'package:assignment_3/pages/authentication/login_page.dart';
 import 'package:assignment_3/provider/theme.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:provider/provider.dart';
@@ -30,7 +33,7 @@ class _HomepageState extends State<Homepage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
   final List<Widget> _pages = [
-    LoginPage(),
+    HomeViewPage(),
     CalculatorView(),
     ContactPage(),
     NotificationsPageWidget(),
@@ -48,6 +51,10 @@ class _HomepageState extends State<Homepage> {
       _previousConnectivity = result;
     });
     _previousConnectivity = ConnectivityResult.mobile;
+  }
+  final user = FirebaseAuth.instance.currentUser; 
+  void signerUserOut(){
+    FirebaseAuth.instance.signOut();
   }
 
   @override
@@ -67,6 +74,7 @@ class _HomepageState extends State<Homepage> {
             _scaffoldKey.currentState?.openDrawer();
           },
         ),
+
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.brightness_6),
@@ -76,7 +84,11 @@ class _HomepageState extends State<Homepage> {
                   Provider.of<ThemeProvider>(context, listen: false);
               themeProvider.swaTheme();
             },
-          )
+          ),
+          IconButton(
+            icon: Icon(Icons.logout), 
+            onPressed: signerUserOut,
+  )
         ],
       ),
       drawer: Drawer(
@@ -115,8 +127,6 @@ class _HomepageState extends State<Homepage> {
       ),
     ),
     Container(
-      // height: 60,
-      // width: 60,
       child: Center(
         child: IconButton(
           onPressed: (){
@@ -133,7 +143,10 @@ class _HomepageState extends State<Homepage> {
   ],
 ),
                   SizedBox(height: 20),
-                  Text("Raoul Mozart", style: TextStyle(color: Colors.white, fontSize: 26)),
+                  Text(
+                    user!.email!, 
+                    style: TextStyle(color: Colors.white, fontSize: 26)
+                  ),
                 ],
               ),
             ),
